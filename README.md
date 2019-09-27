@@ -1,2 +1,1 @@
-# gradient-descent
-Gradient descent visualization
+WORK IN PROGRESS
