@@ -1,11 +1,19 @@
+// NOTE: We use the cost function of the sum of least squares:
+// 1/2n * sum((w_1x + w_0) - y)^2)
 var main = function ()
 {
     "use strict";
 
     // Initialize a Chart with x and y axis
     var chart = initializeChart('chart');
+
     var entryCountInput = document.getElementById("entryCountInput");
     var data = []
+
+    // Line of form: y = ax + b
+    // Start with initial a = 0, b = 0
+    // In order to optimize weights, we will need the partial derivatives for w_0 and w_1
+    var weights = [{weight: 0, part_derivative: w0_part}, {weight: 0, part_derivative: w1_part }];
 
     $("#random-data-button").click(function() {
         // Get number of entries to use
@@ -19,6 +27,12 @@ var main = function ()
 
         // Add the randomly generated data to the Chart
         addScatterDataToChart(chart, data);
+
+        for (var i = 0; i < 1000; ++i) {
+            applyGradientDescentStep(weights, 0.01, data);
+        }
+
+        console.log(weights);
 
         //drawLine(chart, data);
     });
@@ -85,6 +99,45 @@ function getRandomData(entries, min, max) {
     }
 
     return result;
+}
+
+function w0_part(weights, data) {
+    // Partial derivative for w_0 using the least squares cost function is
+    // 1/n * sum((w_1x + w_0) - y)
+
+    var sum = 0;
+
+    data.forEach(function(value, index, array) {
+        sum += weights[1].weight * value.x + weights[0].weight - value.y;
+    })
+
+    return sum / data.length;
+}
+
+function w1_part(weights, data) {
+    // Partial derivate for w_1 using least squares cost function is
+    // 1/n * sum((w_1x + w_0) - y)*x
+
+    var sum = 0;
+
+    data.forEach(function(value, index, array) {
+        sum += (weights[1].weight * value.x + weights[0].weight - value.y) * value.x;
+    })
+
+    return sum / data.length;
+}
+
+function applyGradientDescentStep(weights, learnRate, data) {
+    weights.forEach(function(value, index, array) {
+        // Calculate partial derivative for current weight, and
+        // multiplpy it by the learning rate
+        var descent = learnRate * value.part_derivative(weights, data);
+        
+        // TODO: Check for threshold to stop descent (?)
+
+        // Descend weight
+        value.weight -= descent;
+    });
 }
 
 // Define entry point
