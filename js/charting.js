@@ -4,15 +4,15 @@ var main = function ()
 
     // Initialize a Chart with x and y axis
     var chart = initializeChart('chart');
-
     var entryCountInput = document.getElementById("entryCountInput");
+    var data = []
 
     $("#random-data-button").click(function() {
         // Get number of entries to use
         var entries = entryCountInput.value;
 
         // Generate some random data
-        var data = getRandomData(entries, {x: 0, y: 0}, {x: 10, y: 10});
+        data = getRandomData(entries, {x: 0, y: 0}, {x: 10, y: 10});
         
         // Remove all previous data
         chart.chart.selectAll("circle").remove();
