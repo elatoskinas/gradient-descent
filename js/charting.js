@@ -1,14 +1,25 @@
 var main = function ()
 {
     "use strict";
-    
+
     // Initialize a Chart with x and y axis
     var chart = initializeChart('chart');
 
-    // Generate some random data
-    var data = getRandomData(20, {x: 0, y: 0}, {x: 10, y: 10});
+    var entryCountInput = document.getElementById("entryCountInput");
 
-    addScatterDataToChart(chart, data);
+    $("#random-data-button").click(function() {
+        // Get number of entries to use
+        var entries = entryCountInput.value;
+
+        // Generate some random data
+        var data = getRandomData(entries, {x: 0, y: 0}, {x: 10, y: 10});
+        
+        // Remove all previous data
+        chart.chart.selectAll("circle").remove();
+
+        // Add the randomly generated data to the Chart
+        addScatterDataToChart(chart, data);
+    });
 }
 
 function initializeChart(name) {
@@ -61,5 +72,5 @@ function getRandomData(entries, min, max) {
     return result;
 }
 
-// Define entry point for program (main function in this case)
+// Define entry point
 $(document).ready(main);
