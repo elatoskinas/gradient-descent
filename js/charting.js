@@ -33,7 +33,7 @@ function initializeChart(name) {
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transorm", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Add X axis
     var x = d3.scaleLinear().domain([0, 10]).range([0, width]);
