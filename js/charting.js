@@ -28,14 +28,11 @@ var main = function ()
 
         // Add the randomly generated data to the Chart
         addScatterDataToChart(chart, data);
-
-        /*for (var i = 0; i < 1000; ++i) {
-            applyGradientDescentStep(weights, 0.01, data);
-        }
-
-        var lineData = generateDataForWeights({min: 0, max: 10}, weights);
-        drawLine(chart, lineData);*/
     });
+
+    /*$("#gradient-descent-button").click(function() {
+        applyGradientDescentOnChart(chart, weights, 0.01, data, {min: 0, max: 10});
+    })*/
 }
 
 function initializeChart(name) {
@@ -151,6 +148,11 @@ function generateDataForWeights(x, weights) {
     data.push({x: x.max, y: y1});
 
     return data;
+}
+
+function applyGradientDescentOnChart(chart, weights, learnRate, data, x) {
+    applyGradientDescentStep(weights, learnRate, data);
+    drawLine(chart, generateDataForWeights(x, weights));
 }
 
 // Define entry point
