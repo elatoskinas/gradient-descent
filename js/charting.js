@@ -28,12 +28,12 @@ var main = function ()
         // Add the randomly generated data to the Chart
         addScatterDataToChart(chart, data);
 
-        for (var i = 0; i < 1000; ++i) {
+        /*for (var i = 0; i < 1000; ++i) {
             applyGradientDescentStep(weights, 0.01, data);
         }
 
         var lineData = generateDataForWeights({min: 0, max: 10}, weights);
-        drawLine(chart, lineData);
+        drawLine(chart, lineData);*/
     });
 }
 
@@ -145,7 +145,7 @@ function generateDataForWeights(x, weights) {
     for (var i = x.min; i <= x.max; ++i) {
         // y = ax + b = w_1x + w_0
         y = weights[1].weight * i + weights[0].weight;
-        data.push({x: i, y: y});
+        data.push({x: i, y:});
     }
 
     return data;
