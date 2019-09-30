@@ -1,5 +1,6 @@
 // NOTE: We use the cost function of the sum of least squares:
 // 1/2n * sum((w_1x + w_0) - y)^2)
+
 var main = function ()
 {
     "use strict";
@@ -142,11 +143,12 @@ function applyGradientDescentStep(weights, learnRate, data) {
 function generateDataForWeights(x, weights) {
     data = [];
 
-    for (var i = x.min; i <= x.max; ++i) {
-        // y = ax + b = w_1x + w_0
-        y = weights[1].weight * i + weights[0].weight;
-        data.push({x: i, y:});
-    }
+    // y = ax + b = w_1x + w_0
+    y0 = weights[1].weight * x.min + weights[0].weight;
+    y1 = weights[1].weight * x.max + weights[0].weight;
+
+    data.push({x: x.min, y: y0});
+    data.push({x: x.max, y: y1});
 
     return data;
 }
