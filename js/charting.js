@@ -19,6 +19,8 @@ var main = function ()
 
         // Add the randomly generated data to the Chart
         addScatterDataToChart(chart, data);
+
+        //drawLine(chart, data);
     });
 }
 
@@ -58,6 +60,19 @@ function addScatterDataToChart(chart, data) {
         .attr("cy", function(d) { return chart.yAxis(d.y); })
         .attr("r", 4)
         .style("fill", "#0011bb");
+}
+
+function drawLine(chart, data) {
+    var line = d3.line()
+               .x(function(d) { return chart.xAxis(d.x); })
+               .y(function(d) { return chart.yAxis(d.y); });
+    
+    chart.chart.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "#000000")
+            .attr("stroke-width", 2)
+            .attr("d", line);
 }
 
 function getRandomData(entries, min, max) {
