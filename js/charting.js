@@ -32,9 +32,8 @@ var main = function ()
             applyGradientDescentStep(weights, 0.01, data);
         }
 
-        console.log(weights);
-
-        //drawLine(chart, data);
+        var lineData = generateDataForWeights({min: 0, max: 10}, weights);
+        drawLine(chart, lineData);
     });
 }
 
@@ -138,6 +137,18 @@ function applyGradientDescentStep(weights, learnRate, data) {
         // Descend weight
         value.weight -= descent;
     });
+}
+
+function generateDataForWeights(x, weights) {
+    data = [];
+
+    for (var i = x.min; i <= x.max; ++i) {
+        // y = ax + b = w_1x + w_0
+        y = weights[1].weight * i + weights[0].weight;
+        data.push({x: i, y: y});
+    }
+
+    return data;
 }
 
 // Define entry point
