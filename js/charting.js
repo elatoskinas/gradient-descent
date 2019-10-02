@@ -13,11 +13,6 @@ var main = function ()
 
     var data = []
 
-    // Line of form: y = ax + b
-    // Start with initial a = 0, b = 0
-    // In order to optimize weights, we will need the partial derivatives for w_0 and w_1
-    var weights = [{weight: 0, part_derivative: w0_part}, {weight: 0, part_derivative: w1_part }];
-
     $("#random-data-button").click(function() {
         // Get number of entries to use
         var entries = entryCountInput.value;
@@ -33,13 +28,7 @@ var main = function ()
     });
 
     $("#gradient-descent-button").click(function() {
-        var func = function() {
-            var learnRate = learnRateInput.value;
-            applyGradientDescentOnChart(chart, weights, learnRate, data, {min: 0, max: 10});
-            setTimeout(func, 100);
-        }
-
-        func();
+        startGradientDescent(chart, data, learnRateInput);
     })
 }
 
@@ -134,16 +123,22 @@ function w1_part(weights, data) {
 }
 
 function applyGradientDescentStep(weights, learnRate, data) {
+    partDerivates = [];
+
     weights.forEach(function(value, index, array) {
+        var partialDerivative = value.part_derivative(weights, data);
+
+        partDerivates.push(partialDerivative);
+
         // Calculate partial derivative for current weight, and
         // multiplpy it by the learning rate
-        var descent = learnRate * value.part_derivative(weights, data);
-        
-        // TODO: Check for threshold to stop descent (?)
+        var descent = learnRate * partialDerivative;
 
         // Descend weight
         value.weight -= descent;
     });
+
+    return partDerivates;
 }
 
 function generateDataForWeights(x, weights) {
@@ -160,9 +155,40 @@ function generateDataForWeights(x, weights) {
 }
 
 function applyGradientDescentOnChart(chart, weights, learnRate, data, x) {
-    applyGradientDescentStep(weights, learnRate, data); // Apply gradient descent
+    var partDerivatives = applyGradientDescentStep(weights, learnRate, data); // Apply gradient descent
     chart.chart.selectAll(".line").remove(); // Remove previous line
     drawLine(chart, generateDataForWeights(x, weights)); // Draw the new line
+    return partDerivatives;
+}
+
+function startGradientDescent(chart, data, learnRate) {
+    // Line of form: y = ax + b
+    // Start with initial a = 0, b = 0
+    // In order to optimize weights, we will need the partial derivatives for w_0 and w_1
+    var weights = [{weight: 0, part_derivative: w0_part}, {weight: 0, part_derivative: w1_part }];
+
+    var oldPartDerivatives = [];
+
+    var func = function() {
+        var learnRate = learnRateInput.value;
+        var partDerivatives = applyGradientDescentOnChart(chart, weights, learnRate, data, {min: 0, max: 10});
+
+        var derivativeMaxChange = 0;
+
+        if (oldPartDerivatives.length != 0) {
+            partDerivatives.forEach(function(value, index, array) {
+                derivativeMaxChange = Math.max(derivativeMaxChange, Math.abs(array[index] - oldPartDerivatives[index]));
+            });
+        }
+
+        if (derivativeMaxChange > 1e-4 || oldPartDerivatives.length == 0) {
+            setTimeout(func, 100);
+        }
+
+        oldPartDerivatives = partDerivatives;
+    }
+
+    func();
 }
 
 // Define entry point
