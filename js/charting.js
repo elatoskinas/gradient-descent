@@ -30,9 +30,14 @@ var main = function ()
         addScatterDataToChart(chart, data);
     });
 
-    /*$("#gradient-descent-button").click(function() {
-        applyGradientDescentOnChart(chart, weights, 0.01, data, {min: 0, max: 10});
-    })*/
+    $("#gradient-descent-button").click(function() {
+        var func = function() {
+            applyGradientDescentOnChart(chart, weights, 0.01, data, {min: 0, max: 10});
+            setTimeout(func, 100);
+        }
+
+        func();
+    })
 }
 
 function initializeChart(name) {
@@ -77,13 +82,14 @@ function drawLine(chart, data) {
     var line = d3.line()
                .x(function(d) { return chart.xAxis(d.x); })
                .y(function(d) { return chart.yAxis(d.y); });
-    
+
     chart.chart.append("path")
-            .datum(data)
+            .data([data])
             .attr("fill", "none")
             .attr("stroke", "#000000")
             .attr("stroke-width", 2)
-            .attr("d", line);
+            .attr("d", line)
+            .attr("class", "line");
 }
 
 function getRandomData(entries, min, max) {
@@ -151,8 +157,9 @@ function generateDataForWeights(x, weights) {
 }
 
 function applyGradientDescentOnChart(chart, weights, learnRate, data, x) {
-    applyGradientDescentStep(weights, learnRate, data);
-    drawLine(chart, generateDataForWeights(x, weights));
+    applyGradientDescentStep(weights, learnRate, data); // Apply gradient descent
+    chart.chart.selectAll(".line").remove(); // Remove previous line
+    drawLine(chart, generateDataForWeights(x, weights)); // Draw the new line
 }
 
 // Define entry point
