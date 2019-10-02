@@ -9,6 +9,8 @@ var main = function ()
     var chart = initializeChart('chart');
 
     var entryCountInput = document.getElementById("entryCountInput");
+    var learnRateInput = document.getElementById("learnRateInput");
+
     var data = []
 
     // Line of form: y = ax + b
@@ -32,7 +34,8 @@ var main = function ()
 
     $("#gradient-descent-button").click(function() {
         var func = function() {
-            applyGradientDescentOnChart(chart, weights, 0.01, data, {min: 0, max: 10});
+            var learnRate = learnRateInput.value;
+            applyGradientDescentOnChart(chart, weights, learnRate, data, {min: 0, max: 10});
             setTimeout(func, 100);
         }
 
