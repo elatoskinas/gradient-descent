@@ -1,5 +1,7 @@
 // NOTE: We use the cost function of the sum of least squares:
 // 1/2n * sum((w_1x + w_0) - y)^2)
+// Function that runs gradient descent
+var descentFunction;
 
 var main = function ()
 {
@@ -8,6 +10,7 @@ var main = function ()
     // Initialize a Chart with x and y axis
     var chart = initializeChart('chart');
 
+    // Get inputs from forms
     var entryCountInput = document.getElementById("entryCountInput");
     var learnRateInput = document.getElementById("learnRateInput");
 
@@ -27,8 +30,9 @@ var main = function ()
         addScatterDataToChart(chart, data);
     });
 
+    // Add onClick listener to gradient descent button to start the descent
     $("#gradient-descent-button").click(function() {
-        startGradientDescent(chart, data, learnRateInput);
+        startGradientDescent(chart, data, learnRateInput.value, 100, 1e-3);
     })
 }
 
@@ -161,34 +165,49 @@ function applyGradientDescentOnChart(chart, weights, learnRate, data, x) {
     return partDerivatives;
 }
 
-function startGradientDescent(chart, data, learnRate) {
+function startGradientDescent(chart, data, learnRate, nIterations, limit) {
+    // Stop current recursive descent function
+    clearTimeout(descentFunction)
+
     // Line of form: y = ax + b
     // Start with initial a = 0, b = 0
     // In order to optimize weights, we will need the partial derivatives for w_0 and w_1
-    var weights = [{weight: 0, part_derivative: w0_part}, {weight: 0, part_derivative: w1_part }];
+    var dataObject = {}
+    dataObject.chart = chart
+    dataObject.data = data
+    dataObject.weights = [{weight: 0, part_derivative: w0_part}, {weight: 0, part_derivative: w1_part }]
+    dataObject.minmax = {min: 0, max: 10}
+    dataObject.oldPartDerivatives = []
 
-    var oldPartDerivatives = [];
+    var params = {}
+    params.learnRate = learnRate
+    params.nIterations = nIterations
+    params.limit = limit
 
-    var func = function() {
-        var learnRate = learnRateInput.value;
-        var partDerivatives = applyGradientDescentOnChart(chart, weights, learnRate, data, {min: 0, max: 10});
+    recursiveDescent(0, dataObject, params)
+}
 
-        var derivativeMaxChange = 0;
+function recursiveDescent(iteration, data, params) {
+    var partDerivatives = applyGradientDescentOnChart(data.chart, data.weights, params.learnRate, data.data, data.minmax)
 
-        if (oldPartDerivatives.length != 0) {
-            partDerivatives.forEach(function(value, index, array) {
-                derivativeMaxChange = Math.max(derivativeMaxChange, Math.abs(array[index] - oldPartDerivatives[index]));
-            });
-        }
+    var derivativeMaxChange = 0;
 
-        if (derivativeMaxChange > 1e-4 || oldPartDerivatives.length == 0) {
-            setTimeout(func, 100);
-        }
+    console.log(data)
 
-        oldPartDerivatives = partDerivatives;
+    if (data.oldPartDerivatives.length != 0) {
+        partDerivatives.forEach(function(value, index, array) {
+            var diff = Math.abs(array[index] - data.oldPartDerivatives[index])
+            derivativeMaxChange = Math.max(derivativeMaxChange, diff);
+        });
     }
 
-    func();
+    if ((derivativeMaxChange > params.limit || data.oldPartDerivatives.length == 0) && iteration < params.nIterations) {
+        //descentFunction = setTimeout(func, 100);
+        descentFunction = setTimeout(function() {
+            data.oldPartDerivatives = partDerivates
+            recursiveDescent(iteration + 1, data, params)
+        }, 100)
+    }
 }
 
 // Define entry point
