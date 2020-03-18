@@ -1,1 +1,1 @@
-WORK IN PROGRESS
+Visualization of gradient descent learning
